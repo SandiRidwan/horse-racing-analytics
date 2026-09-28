@@ -8,6 +8,7 @@ Jalankan: streamlit run app/dashboard.py
 from __future__ import annotations
 
 import json
+import sys
 from pathlib import Path
 
 import numpy as np
@@ -19,6 +20,8 @@ import streamlit as st
 ROOT = Path(__file__).resolve().parent.parent
 PROC = ROOT / "data" / "processed"
 TABLES = ROOT / "reports" / "tables"
+sys.path.insert(0, str(ROOT / "src"))
+import explanations as X  # noqa: E402
 
 C = {"p": "#1F5C3D", "a": "#E4A11B", "d": "#1B2A33", "g": "#8B9AA6",
      "r": "#C0392B", "b": "#2E6F95"}
@@ -100,6 +103,7 @@ st.write("")
 t1, t2, t3, t4 = st.tabs(["🎯 Predictions", "📊 Model", "💰 Backtest", "📈 Racing"])
 
 with t1:
+    X.render("predictions", st=st)
     st.markdown("#### Prediksi pemenang per race")
     races = (df.groupby(["track", "race_number"])["pred_prob"].max()
              .reset_index().head(60))
@@ -123,6 +127,8 @@ with t1:
             use_container_width=True, hide_index=True)
 
 with t2:
+    X.render("feature_importance", st=st)
+    X.render("calibration", st=st)
     c1, c2 = st.columns(2)
     with c1:
         coef = pd.Series(metrics.get("coef") or {}).sort_values().tail(14)
@@ -146,6 +152,7 @@ with t2:
         st.plotly_chart(fig, use_container_width=True)
 
 with t3:
+    X.render("backtest", st=st)
     st.markdown("#### Backtest strategi taruhan")
     show = bt.copy()
     show["n_bets"] = show["n_bets"].astype(int)
@@ -163,7 +170,7 @@ with t3:
 with t4:
     c1, c2 = st.columns(2)
     with c1:
-        st.markdown("##### Win rate per bucket odds")
+        X.render("odds_winrate", st=st)
         d = df[df["best_odds"].notna() & df["won"].notna()].copy()
         d["odds"] = pd.to_numeric(d["best_odds"], errors="coerce")
         d["bucket"] = pd.cut(d["odds"], [0, 2, 4, 6, 10, 20, 1000],
@@ -177,7 +184,7 @@ with t4:
                                       yaxis_title="win rate")
         st.plotly_chart(fig, use_container_width=True)
     with c2:
-        st.markdown("##### Win rate per barrier")
+        X.render("barrier", st=st)
         d = df[df["barrier"].notna() & df["won"].notna()].copy()
         d["barrier"] = pd.to_numeric(d["barrier"], errors="coerce")
         d = d[d["barrier"] <= 12]
