@@ -314,6 +314,25 @@ pada data lebih besar. Ini bukan saran taruhan.
 
 ---
 
+
+
+---
+
+## 📖 Cara Membaca Dashboard (Kenapa · Tujuan · Dampak)
+
+Setiap chart & tabel di dashboard ini dilengkapi **kotak penjelasan** yang menjawab
+tiga hal — sesuai standar analisis profesional:
+
+| Pertanyaan | Arti |
+|-----------|------|
+| **🔎 Kenapa** | Mengapa metrik/analisis ini dipilih (masalah & konteks) |
+| **🎯 Tujuan** | Pertanyaan bisnis apa yang dijawab |
+| **📈 Dampak** | Implikasi / keputusan / tindakan yang timbul |
+| **👁️ Cara baca** | Panduan membaca grafik bila tidak intuitif |
+
+Klik kotak **"💡 … — Kenapa · Tujuan · Dampak"** di atas tiap grafik untuk membukanya.
+Narasi tersimpan di `src/explanations.py` (terpisah, konsisten, dapat diaudit).
+
 ## 👤 Author
 
 <div align="center">
