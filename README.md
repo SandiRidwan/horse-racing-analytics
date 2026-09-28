@@ -8,7 +8,7 @@
 
 ![Python](https://img.shields.io/badge/Python-3.10+-1F5C3D?style=for-the-badge&logo=python&logoColor=white)
 ![pandas](https://img.shields.io/badge/pandas-2.0-150458?style=for-the-badge&logo=pandas&logoColor=white)
-![Streamlit](https://img.shields.io/badge/Streamlit-Live_App-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white)
+[![Streamlit](https://img.shields.io/badge/Streamlit-Live_App-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white)](https://horse-racing-analytics-2mimqzngbjpolxkezctzuu.streamlit.app/)
 ![Plotly](https://img.shields.io/badge/Plotly-Interactive-3F4F75?style=for-the-badge&logo=plotly&logoColor=white)
 ![Zero-Browser](https://img.shields.io/badge/Scraping-Zero--Browser_%2B_Proxy_AU-1F5C3D?style=for-the-badge)
 ![ML](https://img.shields.io/badge/Model-Logistic_Regression-E4A11B?style=for-the-badge)
@@ -37,9 +37,15 @@
 ## 🎬 Demo
 
 <div align="center">
-  <img src="reports/figures/dashboard_top.png" width="880" alt="Horse Racing Dashboard" />
-  <br/>
-  <sub><i>Interactive Streamlit dashboard — predictions, model diagnostics, honest backtest</i></sub>
+
+### ▶️ [**Buka Live Dashboard →**](https://horse-racing-analytics-2mimqzngbjpolxkezctzuu.streamlit.app/)
+
+[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://horse-racing-analytics-2mimqzngbjpolxkezctzuu.streamlit.app/)
+
+<img src="reports/figures/dashboard_top.png" width="880" alt="Horse Racing Dashboard" />
+<br/>
+<sub><i>Interactive Streamlit dashboard — predictions, model diagnostics, honest backtest</i></sub>
+
 </div>
 
 <br/>
