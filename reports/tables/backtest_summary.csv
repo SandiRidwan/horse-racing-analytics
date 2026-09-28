@@ -1,0 +1,7 @@
+,n_bets,profit,staked,roi_pct,win_rate,avg_odds
+Semua favorit (baseline),64.0,-23.38,64.0,-36.53,25.0,2.98
+Pilihan model (top-1),64.0,-3.13,64.0,-4.89,31.2,3.25
+Value bet (edge > 0%),176.0,-85.51,176.0,-48.59,8.0,55.52
+Value bet (edge > 5%),18.0,-7.18,18.0,-39.89,22.2,30.41
+Value bet (edge > 10%),3.0,-0.38,3.0,-12.67,33.3,3.61
+Value bet (edge > 15%),1.0,-1.0,1.0,-100.0,0.0,3.2
