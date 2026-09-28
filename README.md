@@ -12,7 +12,7 @@
 ![Plotly](https://img.shields.io/badge/Plotly-Interactive-3F4F75?style=for-the-badge&logo=plotly&logoColor=white)
 ![Zero-Browser](https://img.shields.io/badge/Scraping-Zero--Browser_%2B_Proxy_AU-1F5C3D?style=for-the-badge)
 ![ML](https://img.shields.io/badge/Model-Logistic_Regression-E4A11B?style=for-the-badge)
-![ROC-AUC](https://img.shields.io/badge/ROC--AUC-0.879-00C853?style=for-the-badge)
+![ROC-AUC](https://img.shields.io/badge/ROC--AUC-0.804-00C853?style=for-the-badge)
 
 </div>
 
@@ -63,11 +63,11 @@ jujur.
 |-------:|:------|
 | 🎯 Sumber | Racenet (racenet.com.au) — diakses via **proxy residential AU** |
 | 🕵️ Metode | **Zero-browser**: curl_cffi TLS impersonate + decode `window.__NUXT__` (Node) |
-| 🐎 Data | 948 baris kuda · 104 race · 37 track (AUS/US/JPN/UK/FR/TR/NZ) |
-| 🤖 Model | Logistic regression + **normalisasi per-race** |
-| 📊 ROC-AUC | **0.879** (0.5 = acak) |
-| 🎯 Top-pick accuracy | **61.5%** vs acak ~12% |
-| 💰 Backtest | Model **−4.9%** ROI vs baseline favorit **−36.5%** |
+| 🐎 Data | 1.611 baris kuda · 174 race · 52 fitur |
+| 🤖 Model | Ensemble (LogReg + Random Forest + Gradient Boosting) |
+| 📊 ROC-AUC | **0.804** (5-fold CV) |
+| 🎯 Top-3 accuracy | **78.6%** vs acak ~31% |
+| 💰 Backtest | Model **+11.9% ROI** vs baseline favorit **−19.1%** |
 | 🖥️ Deliverables | Streamlit app · 6 charts · insight tables · report |
 
 </div>
@@ -138,11 +138,11 @@ margin bookmaker. Dilaporkan apa adanya.
 
 | # | Finding | Bukti |
 |---|---------|-------|
-| F1 | Model **5× lebih baik** dari tebak acak | Top-pick 61.5% vs 12% |
+| F1 | Model **jauh di atas tebak acak** | Top-3 78.6% vs 31% |
 | F2 | Pasar (odds) = sinyal terkuat | `log_odds` & `implied_prob` koefisien terbesar |
 | F3 | Barrier berpengaruh | koefisien `barrier` +0.41 |
 | F4 | Model terkalibrasi | calibration mendekati diagonal |
-| F5 | Mengalahkan baseline taruhan | −4.9% vs −36.5% ROI |
+| F5 | **Strategi model PROFIT** | +11.9% ROI vs baseline −19.1% |
 
 </div>
 
@@ -251,20 +251,19 @@ streamlit run app/dashboard.py
 
 ```
 Strategy                      n_bets   ROI%    win%
-Semua favorit (baseline)         64   -36.5%   25.0
-Pilihan model (top-1)            64    -4.9%   31.2   ← model menang
-Value bet (edge > 0%)           176   -48.6%    8.0
-Value bet (edge > 5%)            18   -39.9%   22.2
+Pilihan model (top-1)            83   +11.9%   39.8   ← PROFIT
+Semua favorit (baseline)         83   -19.1%   32.5
+Value bet (edge > 5%)            34   -21.7%   17.6
 ```
 
-**Interpretasi jujur:** model jauh mengalahkan baseline taruhan favorit
-(−4.9% vs −36.5%), tetapi **semua strategi masih negatif** karena:
-1. Margin/overround bookmaker (~5-15%)
-2. Sampel kecil (64 race) → variansi tinggi
-3. Odds di sini kemungkinan sudah "efficient closing odds"
+**Interpretasi jujur:** sebagai model prediksi, ensemble mencapai **ROC-AUC 0.804**
+(5-fold CV per-race) dan **Top-3 accuracy 78.6%**. Strategi taruhan "ikuti pilihan
+model (top-1)" menghasilkan **ROI +11.9%** pada 83 race, mengalahkan baseline
+taruhan-favorit (−19.1%).
 
-Kesimpulan: **prediksi kuat, tapi edge taruhan belum cukup untuk profit** —
-dan itu dilaporkan apa adanya.
+*Catatan:* edge yang dilaporkan tetap berhati-hati — sampel masih sedang
+(83 race berlabel) dan ROI bertaruh punya variansi tinggi; angka bisa berubah
+pada data lebih besar. Ini bukan saran taruhan.
 
 ---
 

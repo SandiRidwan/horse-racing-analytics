@@ -1,4 +1,4 @@
-"""
+﻿"""
 backtest.py — Strategi value betting & backtest ROI.
 
 DASAR KONSEP:
@@ -35,9 +35,9 @@ TABLES.mkdir(parents=True, exist_ok=True)
 
 def load_bets():
     """Ambil data dengan odds + hasil + prediksi."""
-    df = pd.read_csv(PROC / "predictions.csv")
-    df = df[df["best_win_odds"].notna() & df["won"].notna()].copy()
-    df["odds"] = pd.to_numeric(df["best_win_odds"], errors="coerce")
+    df = pd.read_csv(PROC / "predictions_v2.csv")
+    df = df[df["best_odds"].notna() & df["won"].notna()].copy()
+    df["odds"] = pd.to_numeric(df["best_odds"], errors="coerce")
     df["implied_prob"] = 1 / df["odds"]
     df["edge"] = df["pred_prob"] - df["implied_prob"]
     df["won"] = df["won"].astype(int)

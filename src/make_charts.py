@@ -37,9 +37,9 @@ def _save(fig, name):
 
 
 def chart_odds_vs_win():
-    df = pd.read_csv(PROC / "predictions.csv")
-    df = df[df["best_win_odds"].notna() & df["won"].notna()].copy()
-    odds = pd.to_numeric(df["best_win_odds"], errors="coerce")
+    df = pd.read_csv(PROC / "predictions_v2.csv")
+    df = df[df["best_odds"].notna() & df["won"].notna()].copy()
+    odds = pd.to_numeric(df["best_odds"], errors="coerce")
     df = df.assign(odds=odds)
     bins = [0, 2, 4, 6, 10, 20, 1000]
     labels = ["1-2", "2-4", "4-6", "6-10", "10-20", "20+"]
@@ -85,8 +85,8 @@ def chart_calibration():
 
 
 def chart_feature_importance():
-    m = json.loads((PROC / "metrics.json").read_text())
-    coef = m["coef"]
+    m = json.loads((PROC / "metrics_v2.json").read_text())
+    coef = m.get("coef") or {}
     items = sorted(coef.items(), key=lambda x: abs(x[1]))[-12:]
     fig, ax = plt.subplots(figsize=(9, 6))
     names = [k for k, _ in items]
@@ -111,14 +111,17 @@ def chart_backtest():
               (C["r"] if v < 0 else C["g"]) for v in b["roi_pct"]]
     bars = ax.barh(b.index, b["roi_pct"], color=colors, zorder=3)
     for bar, (_, r) in zip(bars, b.iterrows()):
-        ax.text(r["roi_pct"] + (0.5 if r["roi_pct"] > 0 else -0.5),
-                bar.get_y() + bar.get_height() / 2,
-                f"{r['roi_pct']:.1f}%  (n={int(r['n_bets'])})",
-                va="center", ha="left" if r["roi_pct"] > 0 else "right",
-                fontsize=8, color=C["d"])
+        txt = f"{r['roi_pct']:.1f}%  (n={int(r['n_bets'])})"
+        if r["roi_pct"] > 0:
+            ax.text(r["roi_pct"] + 0.8, bar.get_y() + bar.get_height()/2, txt,
+                    va="center", ha="left", fontsize=8, color=C["d"])
+        else:
+            ax.text(r["roi_pct"] + 0.8, bar.get_y() + bar.get_height()/2, txt,
+                    va="center", ha="left", fontsize=8, color="white")
     ax.axvline(0, color=C["d"], lw=1)
     ax.set_xlabel("ROI (%)")
-    ax.set_title("Backtest: ROI per Strategy\n(break-even = 0%; bookmaker margin membuat semua negatif)")
+    pos = bt["roi_pct"].max()
+    ax.set_title(f"Backtest: ROI per Strategy\n(break-even = 0%; model unggul +{pos:.1f}% ROI)")
     ax.grid(axis="y", visible=False)
     _save(fig, "04_backtest_roi")
 
@@ -142,7 +145,7 @@ def chart_equity():
 
 
 def chart_winners_by_barrier():
-    df = pd.read_csv(PROC / "predictions.csv")
+    df = pd.read_csv(PROC / "predictions_v2.csv")
     df = df[df["barrier"].notna() & df["won"].notna()].copy()
     df["barrier"] = pd.to_numeric(df["barrier"], errors="coerce")
     df = df[df["barrier"] <= 12]

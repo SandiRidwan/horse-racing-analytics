@@ -29,8 +29,8 @@ st.set_page_config(page_title="Horse Racing Analytics", page_icon="🏇",
 
 @st.cache_data(show_spinner="Memuat data balap...")
 def load():
-    pred = pd.read_csv(PROC / "predictions.csv")
-    metrics = json.loads((PROC / "metrics.json").read_text())
+    pred = pd.read_csv(PROC / "predictions_v2.csv")
+    metrics = json.loads((PROC / "metrics_v2.json").read_text())
     bt = pd.read_csv(TABLES / "backtest_summary.csv", index_col=0)
     return pred, metrics, bt
 
@@ -83,15 +83,18 @@ df = pred.copy()
 if sel_tracks:
     df = df[df["track"].isin(sel_tracks)]
 if only_odds:
-    df = df[df["best_win_odds"].notna()]
+    df = df[df["best_odds"].notna()]
 
 k1, k2, k3, k4, k5 = st.columns(5)
 kpi(k1, "Kenalan kuda", f"{len(df):,}", "pada data terfilter", C["p"])
-kpi(k2, "ROC-AUC", f"{metrics['roc_auc']:.3f}", "0.5=acak · 1.0=sempurna", C["b"])
-kpi(k3, "Top-pick acc", f"{metrics['top_pick_acc']*100:.1f}%",
-    "vs acak ~12%", C["a"])
-kpi(k4, "Brier", f"{metrics['brier']:.3f}", "makin kecil makin baik", C["r"])
-kpi(k5, "Races (test)", f"{metrics['n_races_test']}", "evaluasi hold-out", C["d"])
+_ens = metrics.get("models", {}).get("Ensemble", {})
+_auc = _ens.get("roc_auc", metrics.get("roc_auc", 0))
+_brier = _ens.get("brier", metrics.get("brier", 0))
+_t3 = _ens.get("top3", metrics.get("top3", 0))
+kpi(k2, "ROC-AUC", f"{_auc:.3f}", "5-fold CV · 0.5=acak", C["b"])
+kpi(k3, "Top-3 acc", f"{_t3*100:.1f}%", "ensemble (CV)", C["a"])
+kpi(k4, "Brier", f"{_brier:.3f}", "makin kecil makin baik", C["r"])
+kpi(k5, "Races (CV)", f"{metrics.get('n_races','-')}", "5-fold cross-val", C["d"])
 st.write("")
 
 t1, t2, t3, t4 = st.tabs(["🎯 Predictions", "📊 Model", "💰 Backtest", "📈 Racing"])
@@ -109,20 +112,20 @@ with t1:
         sub = sub.sort_values("pred_prob", ascending=False)
         fig = px.bar(sub, x="pred_prob", y="horse", orientation="h",
                      color="pred_prob", color_continuous_scale="Greens",
-                     hover_data=["best_win_odds", "implied_prob", "barrier"])
+                     hover_data=["best_odds", "implied_prob", "barrier"])
         fig.update_traces(texttemplate="%{x:.1%}", textposition="outside")
         style(fig, 420).update_layout(coloraxis_showscale=False,
                                       title=f"{tr} — Race {rn}: probabilitas menang")
         st.plotly_chart(fig, use_container_width=True)
         st.dataframe(
-            sub[["horse", "number", "barrier", "best_win_odds", "implied_prob",
+            sub[["horse", "number", "barrier", "best_odds", "implied_prob",
                  "pred_prob", "won", "finish_position"]],
             use_container_width=True, hide_index=True)
 
 with t2:
     c1, c2 = st.columns(2)
     with c1:
-        coef = pd.Series(metrics["coef"]).sort_values()
+        coef = pd.Series(metrics.get("coef") or {}).sort_values().tail(14)
         fig = px.bar(x=coef.values, y=coef.index, orientation="h",
                      color=coef.values, color_continuous_scale="RdYlGn")
         style(fig, 520).update_layout(coloraxis_showscale=False,
@@ -161,8 +164,8 @@ with t4:
     c1, c2 = st.columns(2)
     with c1:
         st.markdown("##### Win rate per bucket odds")
-        d = df[df["best_win_odds"].notna() & df["won"].notna()].copy()
-        d["odds"] = pd.to_numeric(d["best_win_odds"], errors="coerce")
+        d = df[df["best_odds"].notna() & df["won"].notna()].copy()
+        d["odds"] = pd.to_numeric(d["best_odds"], errors="coerce")
         d["bucket"] = pd.cut(d["odds"], [0, 2, 4, 6, 10, 20, 1000],
                              labels=["1-2", "2-4", "4-6", "6-10", "10-20", "20+"])
         g = d.groupby("bucket", observed=True)["won"].agg(["mean", "size"]).reset_index()
