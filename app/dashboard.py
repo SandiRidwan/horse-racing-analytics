@@ -22,6 +22,8 @@ PROC = ROOT / "data" / "processed"
 TABLES = ROOT / "reports" / "tables"
 sys.path.insert(0, str(ROOT / "src"))
 import explanations as X  # noqa: E402
+import insights_content  # noqa: E402,F401
+import insight as INS  # noqa: E402
 
 C = {"p": "#1F5C3D", "a": "#E4A11B", "d": "#1B2A33", "g": "#8B9AA6",
      "r": "#C0392B", "b": "#2E6F95"}
@@ -125,6 +127,7 @@ with t1:
             sub[["horse", "number", "barrier", "best_odds", "implied_prob",
                  "pred_prob", "won", "finish_position"]],
             use_container_width=True, hide_index=True)
+        INS.box("predictions", st=st)
 
 with t2:
     X.render("feature_importance", st=st)
@@ -150,6 +153,8 @@ with t2:
                                       xaxis_title="Predicted",
                                       yaxis_title="Actual")
         st.plotly_chart(fig, use_container_width=True)
+    INS.box("feature_importance", st=st)
+    INS.box("calibration", st=st)
 
 with t3:
     X.render("backtest", st=st)
@@ -166,6 +171,7 @@ with t3:
     st.info("⚠️ Semua strategi masih negatif karena margin bookmaker & sampel "
             "kecil. Yang penting: model (−4.9%) jauh mengalahkan baseline "
             "favorit (−36.5%). Kejujuran ini bagian dari analisis.")
+    INS.box("backtest", st=st)
 
 with t4:
     c1, c2 = st.columns(2)
@@ -183,6 +189,7 @@ with t4:
                                       title="Win rate vs odds",
                                       yaxis_title="win rate")
         st.plotly_chart(fig, use_container_width=True)
+        INS.box("odds_winrate", st=st)
     with c2:
         X.render("barrier", st=st)
         d = df[df["barrier"].notna() & df["won"].notna()].copy()
@@ -196,6 +203,7 @@ with t4:
                                       title="Win rate vs barrier",
                                       yaxis_title="win rate")
         st.plotly_chart(fig, use_container_width=True)
+        INS.box("barrier", st=st)
 
 st.markdown(
     f"""<hr style="border-color:#2A3038;">
