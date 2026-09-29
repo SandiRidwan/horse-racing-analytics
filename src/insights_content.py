@@ -116,3 +116,53 @@ register(
         "model. Keputusan berbasis asumsi tanpa bukti = edge yang hilang."),
     tingkat="sedang",
 )
+
+
+# --------------------------------------------------------------------------
+# Chart ECharts (v2) — insight & rekomendasi.
+# --------------------------------------------------------------------------
+
+register(
+    "echarts_boxplot",
+    kesimpulan=(
+        "Boxplot probabilitas prediksi per track mengungkap KEPERCAYAAN model: "
+        "kotak sempit & rendah = field merata (model ragu, tak ada favorit kuat); "
+        "kotak tinggi dengan pencilan = ada kuda dominan yang diprediksi jauh di "
+        "atas sisanya. Bentuk ini menentukan seberapa 'tegas' sebuah race."),
+    rekomendasi=[
+        "Fokuskan value-betting pada race dengan sebaran LEBAR (ada kuda "
+        "underrated) alih-alih race merata yang sulit diprediksi.",
+        "Waspadai race dengan satu pencilan ekstrem — model sangat yakin, tetapi "
+        "satu kuda = risiko konsentrasi tinggi.",
+        "Kalibrasi ulang bila banyak track menunjukkan kotak sempit (model "
+        "kehilangan daya pisah).",
+    ],
+    risiko=(
+        "Bertaruh di race merata (sebaran sempit) berarti bersaing dengan "
+        "kepastian rendah — ROI cenderung buruk. Sebaliknya, terlalu percaya pada "
+        "satu pencilan bisa hancur bila kuda itu gagal. Backtest tetap wajib."),
+    tingkat="sedang",
+)
+
+register(
+    "echarts_waterfall",
+    kesimpulan=(
+        "Waterfall menjembatani ROI baseline 'taruhan favorit' (negatif) ke ROI "
+        "'pilihan model' (positif): bar merah = titik awal merugi, bar hijau = "
+        "nilai tambah dari seleksi model, bar biru = hasil akhir. Ini "
+        "memvisualisasikan bahwa KEUNGGULAN UTAMA bukan menang besar, melainkan "
+        "menghindari kerugian besar."),
+    rekomendasi=[
+        "Ukur strategi dari SELISIH terhadap baseline favorit, bukan ROI absolut "
+        "— baseline negatif itu ekspektasi pasar.",
+        "Jika keunggulan model menghilang pada sampel lebih besar, perlakukan "
+        "sebagai kebetulan (model belum terbukti).",
+        "Perluas sampel sebelum mempercayai ROI positif mana pun — margin "
+        "bookmaker tetap lawan utama.",
+    ],
+    risiko=(
+        "ROI positif pada sampel kecil mudah menyesatkan. Menganggapnya sebagai "
+        "sinyal 'siap taruhan uang nyata' berisiko kerugian besar. Bukan saran "
+        "taruhan — analisis edukasional."),
+    tingkat="tinggi",
+)

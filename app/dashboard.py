@@ -145,7 +145,7 @@ with t1:
                 height=460)
     except Exception as _e:  # noqa: BLE001
         st.caption(f"boxplot tak tersedia ({_e}).")
-    INS.box("predictions", st=st)
+    INS.box("echarts_boxplot", st=st)
 
 with t2:
     X.render("feature_importance", st=st)
@@ -215,7 +215,7 @@ with t3:
             st.caption("Waterfall butuh strategi 'favorit' & 'model' di backtest.")
     except Exception as _e:  # noqa: BLE001
         st.caption(f"waterfall tak tersedia ({_e}).")
-    INS.box("backtest", st=st)
+    INS.box("echarts_waterfall", st=st)
 
 with t4:
     c1, c2 = st.columns(2)
