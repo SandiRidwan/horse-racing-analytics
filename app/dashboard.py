@@ -24,6 +24,7 @@ sys.path.insert(0, str(ROOT / "src"))
 import explanations as X  # noqa: E402
 import insights_content  # noqa: E402,F401
 import insight as INS  # noqa: E402
+import echarts_charts as EC  # noqa: E402  (boxplot, waterfall)
 
 C = {"p": "#1F5C3D", "a": "#E4A11B", "d": "#1B2A33", "g": "#8B9AA6",
      "r": "#C0392B", "b": "#2E6F95"}
@@ -129,6 +130,23 @@ with t1:
             use_container_width=True, hide_index=True)
         INS.box("predictions", st=st)
 
+    st.markdown("#### Sebaran probabilitas prediksi per track (boxplot ECharts)")
+    st.caption("Boxplot per track memperlihatkan **kepercayaan model**: kotak "
+               "rendah & sempit = field merata (model ragu), kotak tinggi = ada "
+               "kuda favorit kuat. Titik = kuda dengan prediksi ekstrem.")
+    try:
+        _tp = (df.groupby("track")["pred_prob"].apply(list))
+        _tp = _tp[_tp.map(len) >= 4].head(14)
+        if len(_tp):
+            EC.boxplot(
+                categories=[str(k)[:16] for k in _tp.index],
+                values=[list(v) for v in _tp.values],
+                title="Sebaran pred_prob per track", yname="probabilitas menang",
+                height=460)
+    except Exception as _e:  # noqa: BLE001
+        st.caption(f"boxplot tak tersedia ({_e}).")
+    INS.box("predictions", st=st)
+
 with t2:
     X.render("feature_importance", st=st)
     X.render("calibration", st=st)
@@ -171,6 +189,32 @@ with t3:
     st.info("⚠️ Semua strategi masih negatif karena margin bookmaker & sampel "
             "kecil. Yang penting: model (−4.9%) jauh mengalahkan baseline "
             "favorit (−36.5%). Kejujuran ini bagian dari analisis.")
+    INS.box("backtest", st=st)
+
+    st.markdown("#### Jembatan ROI: favorit → model (waterfall ECharts)")
+    st.caption("Waterfall menjembatani **ROI baseline 'taruhan favorit'** ke "
+               "**ROI 'pilihan model'**: bar merah = titik awal negatif, bar "
+               "hijau = perbaikan dari strategi model, bar biru = hasil akhir. "
+               "Menunjukkan seberapa besar nilai tambah seleksi model.")
+    try:
+        _roi = bt["roi_pct"].to_dict()
+        _fav = _mdl = None
+        for k in _roi:
+            kl = str(k).lower()
+            if _fav is None and ("favorit" in kl or "favorite" in kl or "baseline" in kl):
+                _fav = float(_roi[k])
+            if _mdl is None and ("model" in kl):
+                _mdl = float(_roi[k])
+        if _fav is not None and _mdl is not None:
+            EC.waterfall(
+                categories=["Favorit (baseline)", "Keunggulan model",
+                            "Model (top-1)"],
+                values=[_fav, (_mdl - _fav), 0.0],
+                title="Dekomposisi ROI (%)", yname="ROI (%)", height=440)
+        else:
+            st.caption("Waterfall butuh strategi 'favorit' & 'model' di backtest.")
+    except Exception as _e:  # noqa: BLE001
+        st.caption(f"waterfall tak tersedia ({_e}).")
     INS.box("backtest", st=st)
 
 with t4:
