@@ -333,6 +333,73 @@ tiga hal — sesuai standar analisis profesional:
 Klik kotak **"💡 … — Kenapa · Tujuan · Dampak"** di atas tiap grafik untuk membukanya.
 Narasi tersimpan di `src/explanations.py` (terpisah, konsisten, dapat diaudit).
 
+<!-- INSIGHTS:START -->
+## 💡 Insight & Rekomendasi (per analisis)
+
+_Setiap analisis disertai kesimpulan, rekomendasi tindakan, dan risiko bila diabaikan — bukan sekadar angka._
+
+### 🔴 Calibration
+**Kesimpulan.** Probabilitas yang baik bukan hanya mengurutkan, tapi AKURAT: kuda yang diprediksi 30% harus menang ~30% dari waktu. Kurva kalibrasi menguji kejujuran probabilitas model.
+
+**Rekomendasi tindakan:**
+- Pakai model HANYA jika kurva kalibrasi dekat garis diagonal.
+- Bila miscalibrated, terapkan koreksi (isotonic/Platt scaling) sebelum menghitung ekspektasi keuntungan.
+- Baru setelah terkalibrasi, hitung value bet yang dapat dipercaya.
+
+**⚠️ Risiko bila diabaikan.** Model miscalibrated membuat perhitungan 'value' salah. Kamu bisa mengira menemukan peluang emas padahal probabilitas sesungguhnya jauh berbeda — kerugian sistematis.
+
+### 🔴 Backtest
+**Kesimpulan.** Akurasi prediksi ≠ keuntungan. Backtest menguji apakah strategi benar-benar menghasilkan ROI positif setelah memperhitungkan odds — ujian sebenarnya sebelum taruhan nyata.
+
+**Rekomendasi tindakan:**
+- Jalankan HANYA strategi dengan ROI positif yang konsisten di beberapa periode, bukan yang menang sekali.
+- Waspadai ROI tinggi dengan sedikit taruhan (bisa kebetulan).
+- Hitung biaya nyata (margin bandar), bukan hanya odds mentah.
+
+**⚠️ Risiko bila diabaikan.** Backtest yang overfitting ke masa lalu memberi keyakinan palsu. Strategi 'juara' di data historis sering gagal total di taruhan nyata.
+
+### 🟠 Predictions
+**Kesimpulan.** Model memprediksi probabilitas menang tiap kuda per balapan. Kualitas model menentukan apakah prediksi bisa dipakai mencari value bet — akurasi tinggi TIDAK otomatis berarti untung.
+
+**Rekomendasi tindakan:**
+- Gunakan probabilitas model HANYA setelah dikalibrasi — jangan pakai skor mentah untuk keputusan uang.
+- Cari 'value bet': kuda dengan probabilitas model > probabilitas tersirat odds (pasar meremehkan) — bukan sekadar kuda terkuat.
+- Uji strategi di data historis (backtest) sebelum mempertaruhkan modal nyata.
+
+**⚠️ Risiko bila diabaikan.** Bertaruh pada favorit model tanpa cek kalibrasi = kalah, karena pasar biasanya sudah efisien di favorit. Modal tergerus oleh favorit yang odds-nya tidak sepadan.
+
+### 🟠 Feature Importance
+**Kesimpulan.** Model 'black-box' tak dapat dipercaya. Feature importance mengungkap sinyal apa yang benar-benar dipakai model — memisahkan sinyal nyata dari kebetulan statistik.
+
+**Rekomendasi tindakan:**
+- Verifikasi fitur penting MASUK AKAL secara domain (form, odds) — bila tidak, curigai data leakage.
+- Buang fitur ber-kontribusi nol/negatif untuk mengurangi overfitting.
+- Bila 'implied_prob' (pasar) dominan, sadari model hanya meniru pasar — nilai tambahnya terbatas.
+
+**⚠️ Risiko bila diabaikan.** Model bergantung pada fitur tak masuk akal (kebocoran data) akan tampak hebat di backtest tapi gagal total saat taruhan nyata.
+
+### 🟠 Odds Winrate
+**Kesimpulan.** Win rate nyata per bucket odds menunjukkan efisiensi pasar. Bila win rate ≈ probabilitas tersirat odds, pasar efisien → sulit mendapat keuntungan sistematis.
+
+**Rekomendasi tindakan:**
+- Cari bucket odds di mana win rate nyata > implied — di situ ada value.
+- Bila semua bucket efisien, kurangi frekuensi bertaruh atau cari pasar yang kurang efisien.
+- Jadikan analisis ini filter: bertaruh hanya saat ada penyimpangan jelas.
+
+**⚠️ Risiko bila diabaikan.** Bertaruh sistematis di pasar efisien = membayar margin bandar tanpa edge. Modal tergerus perlahan, tampak seperti 'sekadar sial'.
+
+### 🔵 Barrier
+**Kesimpulan.** Posisi start (barrier) secara teori memengaruhi peluang. Bila win rate berbeda nyata antar posisi, barrier fitur penting; bila tidak, pengaruhnya dapat diabaikan.
+
+**Rekomendasi tindakan:**
+- Bila signifikan: masukkan barrier sebagai fitur & manfaatkan peluang pada posisi diuntungkan yang diabaikan pasar.
+- Bila tidak signifikan: jangan buang kompleksitas model untuk fitur ini.
+- Verifikasi 'teori' dengan data — jangan asumsikan pengaruh tanpa bukti.
+
+**⚠️ Risiko bila diabaikan.** Mengabaikan faktor berpengaruh nyata (atau menambah yang tidak) melemahkan model. Keputusan berbasis asumsi tanpa bukti = edge yang hilang.
+
+<!-- INSIGHTS:END -->
+
 ## 👤 Author
 
 <div align="center">
